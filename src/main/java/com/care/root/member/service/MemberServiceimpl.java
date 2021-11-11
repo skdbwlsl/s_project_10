@@ -1,6 +1,7 @@
 package com.care.root.member.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
@@ -10,14 +11,21 @@ import com.care.root.mybatis.member.MemberMapper;
 @Service
 public class MemberServiceimpl implements MemberService{
 	@Autowired MemberMapper mapper;
+	BCryptPasswordEncoder encoder;
+	
+	public MemberServiceimpl() {
+		encoder = new BCryptPasswordEncoder();
+	}
 	
 	public int userCheck(String id, String pw){
 		MemberDTO dto =  mapper.userCheck(id);
 		if(dto != null) {
-			if(pw.equals(dto.getPw())) {
+			//if(pw.equals(dto.getPw())) {
+			if(encoder.matches(pw, dto.getPw())){//암호화되지 않은 사용자입력값, 암호화된 db에 있는 값 두개 비교
 				return 0;  //성공
 			}
 		}
+
 		return 1;//실패
 	}
 	//오버라이딩
@@ -28,6 +36,12 @@ public class MemberServiceimpl implements MemberService{
 		model.addAttribute("info", mapper.userCheck(id));
 	}
 	public int register(MemberDTO dto) {
+		System.out.println("비번 변경 전 : " + dto.getPw());
+		String securePw = encoder.encode(dto.getPw());
+		System.out.println("비번 변경 후 : " + securePw);
+		
+		dto.setPw(securePw);
+		
 		int result = 0;
 		try {
 			result = mapper.register(dto);

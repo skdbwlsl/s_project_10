@@ -82,14 +82,15 @@ nav ul li a:hover {
 				<ul>
 					<li><a href="${contextPath }/index">HOME</a></li>
 					<li>
-						<c:choose>
-							<c:when test="${loginUser != null }"> <!-- 세션이 있다면 -->
-								<a href="${contextPath }/member/memberInfo">MEMBER_SHIP</a>
-							</c:when>
-							<c:otherwise>
-								<a href="${contextPath }/member/login">MEMBER_SHIP</a>
-							</c:otherwise>
-						</c:choose>
+					
+					
+					<a href="${contextPath }/member/memberInfo">MEMBER_SHIP</a>
+					
+							
+					</li>
+					<li>
+						<a href="${contextPath }/test/board">TEST_BOARD</a>
+						<a href="${contextPath }/test/write">TEST_WRITE</a>
 					</li>
 					<li>
 						<c:choose>

@@ -49,9 +49,12 @@ public class MemberController implements MemberSessionName{
 		return "redirect:/index";
 	}
 	@GetMapping("memberInfo")
-	public String memberInfo(Model model) {
-		ms.memberInfo(model);
-		return "member/memberInfo";
+	public String memberInfo(Model model, HttpSession session) {
+		//if(session.getAttribute(LOGIN) != null) {
+			ms.memberInfo(model);
+			return "member/memberInfo";
+		//}
+		//return "redirect:login";
 	}
 	@GetMapping("info")
 	public String info(@RequestParam String id, Model model) {
