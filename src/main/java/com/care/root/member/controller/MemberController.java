@@ -1,10 +1,16 @@
 package com.care.root.member.controller;
 
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,24 +33,56 @@ public class MemberController implements MemberSessionName{
 	@PostMapping("/user_check")
 	public String userCheck(@RequestParam String id,
 							@RequestParam String pw,
+							@RequestParam(required = false) String autoLogin,
 							RedirectAttributes rs) {
 		int result = ms.userCheck(id, pw);
+		System.out.println("autoLogin : " + autoLogin);
 		
 		if(result == 0) {
 			rs.addAttribute("id", id);
+			rs.addAttribute("autoLogin", autoLogin);
 			return "redirect:successLogin";
 		}else {
 			return "redirect:login";
 		}
 	}
 	@GetMapping("/successLogin")
-	public String successLogin(@RequestParam String id, HttpSession session) {
+	public String successLogin(@RequestParam String id, 
+								@RequestParam(required = false) String autoLogin,HttpSession session,
+								HttpServletResponse response) { //응답
+		System.out.println("id: " + id);
+		System.out.println("autoLogin : " + autoLogin);
 		session.setAttribute( LOGIN , id);
+		if(autoLogin != null) {
+			int limitTime = 60*60*24*90; //시간설정 : 90일
+			Cookie loginCookie = new Cookie("loginCookie", session.getId());//유일한 값으로 저장 
+			loginCookie.setPath("/");
+			loginCookie.setMaxAge(limitTime);
+			response.addCookie(loginCookie);
+			
+			Calendar cal = Calendar.getInstance();//캘린더 형태로 시간변환
+			cal.setTime(new Date());  //util에 있는 date
+			cal.add(Calendar.MONTH, 3);//현재시간에서 3개월 시간설정
+			
+			java.sql.Date limitDate = new java.sql.Date(cal.getTimeInMillis()); //시간설정
+			ms.keepLogin(session.getId(), limitDate, id);
+		}
 		return "member/successLogin";
 	}
 	@GetMapping("/logout")
-	public String logout(HttpSession session) {
-		if(session.getAttribute( LOGIN ) != null)
+	public String logout(HttpSession session,HttpServletResponse response,
+							@CookieValue(value="loginCookie", required = false) Cookie loginCookie) {
+		
+		if(session.getAttribute( LOGIN ) != null) {
+			if(loginCookie != null) {
+				loginCookie.setPath("/");
+				loginCookie.setMaxAge(0);
+				response.addCookie(loginCookie);
+				ms.keepLogin("nan", 
+								new java.sql.Date(System.currentTimeMillis()),
+								(String)session.getAttribute(LOGIN)); //login : 비교할 아이디
+			}
+		}
 			session.invalidate();
 		return "redirect:/index";
 	}

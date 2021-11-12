@@ -26,6 +26,7 @@
 				<tr>
 					<td colspan="2" align="left">
 						<a href="register_form">회원가입</a>
+						<input type="checkbox" name="autoLogin">로그인 유지
 					</td>
 				</tr>
 			</table>

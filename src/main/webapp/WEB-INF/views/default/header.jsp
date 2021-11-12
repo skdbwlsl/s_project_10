@@ -82,11 +82,7 @@ nav ul li a:hover {
 				<ul>
 					<li><a href="${contextPath }/index">HOME</a></li>
 					<li>
-					
-					
 					<a href="${contextPath }/member/memberInfo">MEMBER_SHIP</a>
-					
-							
 					</li>
 					<li>
 						<a href="${contextPath }/test/board">TEST_BOARD</a>
