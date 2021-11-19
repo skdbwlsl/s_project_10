@@ -37,6 +37,7 @@
 			<interceptor>
 				<!-- <mapping path="/index"/>    index 요청이 되면 -->
 				<mapping path="/member/memberInfo"/> <!-- memberInfo 요청하면 -->
+				<mapping path="/board/writeForm"/>
 				<beans:ref bean = "memberInterceptor"/> <!-- memberInterceptor 동작시켜라 -->
 			</interceptor>
 		
@@ -47,4 +48,10 @@
 			</interceptor>
 			
 		</interceptors>
+		
+	<beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+      <beans:property name="maxUploadSize" value="52428800"/>
+      <beans:property name="defaultEncoding" value="utf-8"/>
+   </beans:bean>
+   
 </beans:beans>
